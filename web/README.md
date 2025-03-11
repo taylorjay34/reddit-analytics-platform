@@ -1,4 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Reddit Analytics Platform - Web Interface
+
+This is the Next.js web interface for the Reddit Analytics Platform.
+
+## Deployment
+
+This directory contains a standalone Next.js application that should be deployed directly to Vercel.
+
+## Structure
+
+- `/src/app` - Next.js application routes
+- `/src/components` - React components
+- `/src/lib` - Utility functions and API clients
+- `/public` - Static assets
+
+## Environment Variables
+
+The following environment variables are required:
+
+```
+NEXT_PUBLIC_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY
+SUPABASE_SERVICE_ROLE_KEY
+REDDIT_USER_AGENT
+REDDIT_CLIENT_ID
+REDDIT_CLIENT_SECRET
+REDDIT_USERNAME
+REDDIT_PASSWORD
+OPENAI_API_KEY
+```
+
+## Development
+
+```
+npm install
+npm run dev
+```
+
+## Build
+
+```
+npm run build
+```
 
 ## Getting Started
 
