@@ -1,12 +1,7 @@
 {
-  "outputDirectory": "web/.next",
-  "buildCommand": "cd web && npm install --force && npm run build",
-  "installCommand": "cd web && npm install --force",
+  "outputDirectory": ".next",
+  "buildCommand": "npm install --force && npm run build",
+  "installCommand": "npm install --force",
   "framework": "nextjs",
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/web/$1"
-    }
-  ]
+  "rootDirectory": "web"
 } 
