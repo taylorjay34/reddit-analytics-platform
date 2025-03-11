@@ -1,0 +1,134 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@plugin "tailwindcss-animate";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@layer base {
+  :root {
+    --font-sans: var(--font-geist-sans);
+    --font-mono: var(--font-geist-mono);
+    --background: oklch(0.13 0.028 261.692);
+    --foreground: oklch(0.985 0.002 247.839);
+    --card: oklch(0.18 0.028 261.692);
+    --card-foreground: oklch(0.985 0.002 247.839);
+    --popover: oklch(0.13 0.028 261.692);
+    --popover-foreground: oklch(0.985 0.002 247.839);
+    --primary: oklch(0.985 0.002 247.839);
+    --primary-foreground: oklch(0.21 0.034 264.665);
+    --secondary: oklch(0.278 0.033 256.848);
+    --secondary-foreground: oklch(0.985 0.002 247.839);
+    --muted: oklch(0.278 0.033 256.848);
+    --muted-foreground: oklch(0.707 0.022 261.325);
+    --accent: oklch(0.278 0.033 256.848);
+    --accent-foreground: oklch(0.985 0.002 247.839);
+    --destructive: oklch(0.396 0.141 25.723);
+    --destructive-foreground: oklch(0.637 0.237 25.331);
+    --border: oklch(0.278 0.033 256.848);
+    --input: oklch(0.278 0.033 256.848);
+    --ring: oklch(0.446 0.03 256.802);
+    --radius: 0.625rem;
+    --chart-1: oklch(0.488 0.243 264.376);
+    --chart-2: oklch(0.696 0.17 162.48);
+    --chart-3: oklch(0.769 0.188 70.08);
+    --chart-4: oklch(0.627 0.265 303.9);
+    --chart-5: oklch(0.645 0.246 16.439);
+    --sidebar: oklch(0.21 0.034 264.665);
+    --sidebar-foreground: oklch(0.985 0.002 247.839);
+    --sidebar-primary: oklch(0.488 0.243 264.376);
+    --sidebar-primary-foreground: oklch(0.985 0.002 247.839);
+    --sidebar-accent: oklch(0.278 0.033 256.848);
+    --sidebar-accent-foreground: oklch(0.985 0.002 247.839);
+    --sidebar-border: oklch(0.278 0.033 256.848);
+    --sidebar-ring: oklch(0.446 0.03 256.802);
+    --reddit-orange: #FF4500;
+    --reddit-blue: #0079D3;
+    --reddit-hover: #FF5414;
+  }
+
+  * {
+    @apply border-border;
+    cursor: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='12' cy='12' r='10' fill='%23FF4500' stroke='white' stroke-width='2'/%3E%3Ccircle cx='8' cy='10' r='2' fill='white'/%3E%3Ccircle cx='16' cy='10' r='2' fill='white'/%3E%3Cpath d='M8 16C8 16 10 18 12 18C14 18 16 16 16 16' stroke='white' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") 12 12, auto;
+  }
+
+  body {
+    @apply bg-background text-foreground min-h-screen;
+  }
+}
+
+@layer components {
+  .gradient-text {
+    @apply bg-gradient-to-r from-[var(--reddit-orange)] via-[var(--reddit-blue)] to-[var(--reddit-orange)] bg-clip-text text-transparent bg-[length:200%_auto] animate-[gradientBg_3s_ease_infinite];
+  }
+
+  .card-hover {
+    @apply transition-all duration-300;
+  }
+
+  .card-hover:hover {
+    @apply transform -translate-y-1 scale-[1.02] shadow-[0_20px_40px_rgba(0,0,0,0.2)];
+  }
+
+  .float-animation {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .pulse-animation {
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .subreddit-card {
+    @apply relative overflow-hidden backdrop-blur-xl border border-border transition-all duration-300;
+    background-color: rgba(24, 24, 27, 0.9);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  .subreddit-card:hover {
+    @apply transform -translate-y-1 shadow-[0_8px_30px_rgba(0,0,0,0.3)];
+  }
+
+  .subreddit-name {
+    @apply text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[var(--reddit-orange)] to-[var(--reddit-blue)] shadow-[0_2px_4px_rgba(0,0,0,0.1)];
+  }
+
+  .page-container {
+    @apply min-h-screen bg-gradient-to-br from-background via-[rgba(24,24,27,0.95)] to-background;
+  }
+
+  .content-container {
+    @apply container mx-auto px-4 py-8;
+  }
+
+  .section-title {
+    @apply text-3xl font-bold mb-6 gradient-text;
+  }
+
+  .grid-layout {
+    @apply grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4;
+  }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes gradientBg {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
