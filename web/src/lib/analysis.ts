@@ -129,26 +129,65 @@ async function categorizePost(post: RedditPost): Promise<string> {
 
 export async function analyzePostThemes(posts: RedditPost[]): Promise<Theme[]> {
   const themes = [...DEFAULT_THEMES]
-
-  // Process posts in parallel, but in chunks to avoid rate limits
-  const chunkSize = 5
-  for (let i = 0; i < posts.length; i += chunkSize) {
-    const chunk = posts.slice(i, i + chunkSize)
-    const promises = chunk.map(async (post) => {
-      const theme = await categorizePost(post)
-      return { post, theme }
-    })
-
-    const results = await Promise.all(promises)
+  
+  // Limit the number of posts to analyze to avoid timeouts
+  const postsToAnalyze = posts.slice(0, 10) // Only analyze up to 10 posts
+  
+  try {
+    // First, check if we have cached analyses for any posts
+    const postIds = postsToAnalyze.map(post => post.id)
+    const existingAnalyses = await getPostAnalyses(postIds)
     
-    // Add posts to their respective themes
-    results.forEach(({ post, theme }) => {
-      const themeObj = themes.find(t => t.id === theme)
-      if (themeObj) {
-        themeObj.posts.push(post)
+    // Create a map of existing analyses for quick lookup
+    const analysisMap = new Map<string, string>()
+    existingAnalyses.forEach(analysis => {
+      analysisMap.set(analysis.post_id, analysis.theme)
+    })
+    
+    // Filter out posts that already have analyses
+    const postsNeedingAnalysis = postsToAnalyze.filter(post => !analysisMap.has(post.id))
+    
+    console.log(`Found ${existingAnalyses.length} cached analyses, need to analyze ${postsNeedingAnalysis.length} new posts`)
+    
+    // Process posts in parallel, but in smaller chunks to avoid rate limits
+    const chunkSize = 3
+    for (let i = 0; i < postsNeedingAnalysis.length; i += chunkSize) {
+      const chunk = postsNeedingAnalysis.slice(i, i + chunkSize)
+      const promises = chunk.map(async (post) => {
+        try {
+          const theme = await categorizePost(post)
+          return { post, theme, success: true }
+        } catch (error) {
+          console.error(`Error analyzing post ${post.id}:`, error)
+          return { post, theme: 'solution-requests', success: false } // Default fallback
+        }
+      })
+      
+      const results = await Promise.all(promises)
+      
+      // Add posts to their respective themes
+      results.forEach(({ post, theme }) => {
+        const themeObj = themes.find(t => t.id === theme)
+        if (themeObj) {
+          themeObj.posts.push(post)
+        }
+      })
+    }
+    
+    // Add posts with cached analyses to their themes
+    postsToAnalyze.forEach(post => {
+      const cachedTheme = analysisMap.get(post.id)
+      if (cachedTheme) {
+        const themeObj = themes.find(t => t.id === cachedTheme)
+        if (themeObj && !themeObj.posts.some(p => p.id === post.id)) {
+          themeObj.posts.push(post)
+        }
       }
     })
+  } catch (error) {
+    console.error('Error in theme analysis:', error)
+    // Even if there's an error, return the themes with any posts we've managed to analyze
   }
-
+  
   return themes
 } 
