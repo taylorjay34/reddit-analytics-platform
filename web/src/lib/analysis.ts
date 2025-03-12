@@ -12,30 +12,33 @@ console.log('Environment check:', {
   heliconeKeyLength: HELICONE_API_KEY?.length
 })
 
-if (!HELICONE_API_KEY) {
-  throw new Error('Missing Helicone API key - please check your .env.local file')
-}
-
+// Only check for OpenAI API key, make Helicone optional
 if (!OPENAI_API_KEY) {
   throw new Error('Missing OpenAI API key - please check your .env.local file')
 }
 
-// Create OpenAI client with Helicone proxy
-const openai = new OpenAI({
+// Create OpenAI client with optional Helicone proxy
+const openaiConfig: any = {
   apiKey: OPENAI_API_KEY,
-  baseURL: "https://oai.helicone.ai/v1",
-  defaultHeaders: {
+}
+
+// Only use Helicone if the API key is available
+if (HELICONE_API_KEY) {
+  openaiConfig.baseURL = "https://oai.helicone.ai/v1"
+  openaiConfig.defaultHeaders = {
     "Helicone-Auth": `Bearer ${HELICONE_API_KEY}`,
     "Helicone-Property-App": "reddit-analytics-platform",
     "Content-Type": "application/json"
   }
-})
+}
+
+const openai = new OpenAI(openaiConfig)
 
 // Log OpenAI configuration for debugging
 console.log('OpenAI Configuration:', {
-  baseURL: openai.baseURL,
+  baseURL: openai.baseURL || 'default OpenAI API URL',
   hasHeliconeAuth: !!HELICONE_API_KEY,
-  heliconeAuthValue: `Bearer ${HELICONE_API_KEY.slice(0, 10)}...`,
+  heliconeAuthValue: HELICONE_API_KEY ? `Bearer ${HELICONE_API_KEY.slice(0, 10)}...` : 'Not configured',
   heliconeProperty: "reddit-analytics-platform"
 })
 

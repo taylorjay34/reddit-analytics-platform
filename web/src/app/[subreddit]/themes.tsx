@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { Button } from "@/components/ui/button"
 
 interface Theme {
   id: string
@@ -60,33 +61,56 @@ export default function Themes({ subreddit }: ThemesProps) {
   const [error, setError] = useState<string | null>(null)
   const [selectedTheme, setSelectedTheme] = useState<Theme | null>(null)
 
-  useEffect(() => {
-    async function fetchThemes() {
-      try {
-        const response = await fetch(`/api/reddit/${subreddit}/themes`)
-        if (!response.ok) {
-          throw new Error('Failed to fetch themes')
-        }
-        const data = await response.json()
-        setThemes(data)
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred')
-      } finally {
-        setLoading(false)
+  async function fetchThemes() {
+    setLoading(true)
+    setError(null)
+    
+    try {
+      const response = await fetch(`/api/reddit/${subreddit}/themes`)
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.error || `Server error: ${response.status}`)
       }
+      
+      const data = await response.json()
+      setThemes(data)
+    } catch (err) {
+      console.error('Theme fetch error:', err)
+      setError(err instanceof Error ? err.message : 'An error occurred fetching themes')
+    } finally {
+      setLoading(false)
     }
+  }
 
+  useEffect(() => {
     fetchThemes()
   }, [subreddit])
 
   if (loading) {
-    return <div className="text-center py-8">Loading themes...</div>
+    return (
+      <div className="flex flex-col items-center justify-center py-12">
+        <div className="animate-pulse text-center">
+          <p className="text-lg font-medium">Analyzing subreddit themes...</p>
+          <p className="text-sm text-muted-foreground mt-2">This may take a moment as we process the posts</p>
+        </div>
+      </div>
+    )
   }
 
   if (error) {
     return (
-      <div className="text-center py-8 text-destructive">
-        Error: {error}
+      <div className="flex flex-col items-center justify-center py-12">
+        <div className="text-center max-w-md mx-auto">
+          <h3 className="text-lg font-medium text-destructive mb-2">Error Loading Themes</h3>
+          <p className="text-sm text-muted-foreground mb-4">{error}</p>
+          <p className="text-sm text-muted-foreground mb-6">
+            This could be due to missing API keys or configuration issues.
+          </p>
+          <Button onClick={fetchThemes} variant="outline">
+            Try Again
+          </Button>
+        </div>
       </div>
     )
   }
